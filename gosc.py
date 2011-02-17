@@ -23,19 +23,31 @@ class oscwrapper:
 		out, err = p.communicate()
 		return out.split()
 
+	def getPrjResults(self, project):
+		p = subprocess.Popen([oscwrapper.command + " prjresults " + project], shell=True, stdout=subprocess.PIPE)
+		out, err = p.communicate()
+		return out
 
 class gosc:
 
 	packages_liststore = gtk.ListStore(str)
+	build_results_area = gtk.TextView()
 
 	def project_selection_changed(self, treeview, path, column):
 		model = treeview.get_model()
 		treeiter = model.get_iter(path)
 		selected_project= model.get_value(treeiter, 0)
+
+		# Update packages list
 		packages = wrapper.getPackages(selected_project)
 		gosc.packages_liststore.clear()
 		for item in packages:
 			gosc.packages_liststore.append([item])
+
+		# Get Build results for all the packages in the project
+		prjresults = wrapper.getPrjResults(selected_project)
+		gosc.build_results_area.get_buffer().set_text(prjresults)
+
 
 	def __init__(self, wrapper):
 
@@ -89,8 +101,13 @@ class gosc:
 		#----------------------------------
 		vbox.add(hbox)
 
-		label = gtk.Label("Build results should come here")
-		vbox.add(label)
+		gosc.build_results_area.get_buffer().set_text("Build results should come here")
+		gosc.build_results_area.set_editable(False)
+
+		build_results_scroll = gtk.ScrolledWindow()
+		build_results_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		build_results_scroll.add(gosc.build_results_area)
+		vbox.add(build_results_scroll)
 
 		window.add(vbox)
 		window.maximize()
