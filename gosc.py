@@ -104,8 +104,8 @@ class gosc:
 	def __init__(self, wrapper):
 
 		window = gtk.Window()
-		hbox = gtk.HBox(True, 0)
-		vbox = gtk.VBox(True, 0)
+		hbox = gtk.HBox(True, 10)
+		vbox = gtk.VBox(True, 10)
 
 		#----------------------------------
 		# Region for setting up the Projects liststore
