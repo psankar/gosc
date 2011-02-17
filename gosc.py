@@ -154,7 +154,7 @@ class gosc:
 		#----------------------------------
 		vbox.add(hbox)
 
-		gosc.build_results_area.get_buffer().set_text("Build results should come here")
+		gosc.build_results_area.get_buffer().set_text("Your projects are listed in the above list.\nDouble-clicking on any project in the above list will get the packages list and populate it on the other listview above-and-right.\nThis area will be filled with the overall build-result of the selected project.\n\nDouble clicking on a package in the other list above will get the build log for the selected package and display it in this area.")
 		gosc.build_results_area.set_editable(False)
 
 		build_results_scroll = gtk.ScrolledWindow()
