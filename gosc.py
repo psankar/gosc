@@ -33,7 +33,7 @@ class gosc:
 	packages_liststore = gtk.ListStore(str)
 	build_results_area = gtk.TextView()
 
-	def project_selection_changed(self, treeview, path, column):
+	def project_double_clicked(self, treeview, path, column):
 		model = treeview.get_model()
 		treeiter = model.get_iter(path)
 		selected_project= model.get_value(treeiter, 0)
@@ -72,7 +72,7 @@ class gosc:
 		cell = gtk.CellRendererText()
 		projects_column.pack_start(cell, False)
 		projects_column.add_attribute(cell, "text", 0)
-		projects_treeview.connect("row-activated", self.project_selection_changed)
+		projects_treeview.connect("row-activated", self.project_double_clicked)
 
 		projects_scroll = gtk.ScrolledWindow()
 		projects_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
