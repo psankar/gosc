@@ -28,24 +28,76 @@ class oscwrapper:
 		out, err = p.communicate()
 		return out
 
+	def getRepositories(self, project):
+		p = subprocess.Popen([oscwrapper.command + " repositories " + project], shell=True, stdout=subprocess.PIPE)
+		out, err = p.communicate()
+		return out.split('\n')
+
+	def getPackageBuildLog(self, project, package, repository_and_arch):
+		p = subprocess.Popen([oscwrapper.command + " remotebuildlog " + project + " " + package + " " + repository_and_arch], shell=True, stdout=subprocess.PIPE)
+		out, err = p.communicate()
+		return out
+
 class gosc:
 
 	packages_liststore = gtk.ListStore(str)
 	build_results_area = gtk.TextView()
+	selected_project = ""
+
+	def package_double_clicked(self, treeview, path, column):
+		model = treeview.get_model()
+		treeiter = model.get_iter(path)
+		selected_package = model.get_value(treeiter, 0)
+
+		# get the repositories list and ask to choose a repository
+		repos_liststore = gtk.ListStore(str)
+		repos_treeview = gtk.TreeView(repos_liststore)
+	
+		repositories = wrapper.getRepositories(gosc.selected_project)
+		for item in repositories:
+			repos_liststore.append([item])
+	
+		repos_column = gtk.TreeViewColumn("Repositories")
+		repos_treeview.append_column(repos_column)
+
+		cell = gtk.CellRendererText()
+		repos_column.pack_start(cell, False)
+		repos_column.add_attribute(cell, "text", 0)
+
+		repos_scroll = gtk.ScrolledWindow()
+		repos_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		repos_scroll.add(repos_treeview)
+
+		dialog = gtk.Dialog("Choose an architecture")
+		dialog.vbox.add(repos_scroll)
+		dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+		dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
+		dialog.set_modal(True)
+		dialog.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
+		dialog.show_all()
+		response = dialog.run()
+		if response == gtk.RESPONSE_OK:
+			rmodel = repos_treeview.get_model()
+			rtreeiter = rmodel.get_iter(path)
+			selected_repo_and_arch = rmodel.get_value(rtreeiter, 0)
+		dialog.destroy()
+
+		results = wrapper.getPackageBuildLog(gosc.selected_project, selected_package, selected_repo_and_arch)
+		gosc.build_results_area.get_buffer().set_text(results)
 
 	def project_double_clicked(self, treeview, path, column):
 		model = treeview.get_model()
 		treeiter = model.get_iter(path)
-		selected_project= model.get_value(treeiter, 0)
+		gosc.selected_project = model.get_value(treeiter, 0)
 
 		# Update packages list
-		packages = wrapper.getPackages(selected_project)
+		packages = wrapper.getPackages(gosc.selected_project)
 		gosc.packages_liststore.clear()
 		for item in packages:
 			gosc.packages_liststore.append([item])
 
 		# Get Build results for all the packages in the project
-		prjresults = wrapper.getPrjResults(selected_project)
+		prjresults = wrapper.getPrjResults(gosc.selected_project)
 		gosc.build_results_area.get_buffer().set_text(prjresults)
 
 
@@ -93,6 +145,7 @@ class gosc:
 		pkg_cell = gtk.CellRendererText()
 		packages_column.pack_start(pkg_cell, False)
 		packages_column.add_attribute(pkg_cell, "text", 0)
+		packages_treeview.connect("row-activated", self.package_double_clicked)
 
 		packages_scroll = gtk.ScrolledWindow()
 		packages_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
