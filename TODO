@@ -1,0 +1,6 @@
+Add some kind of "Loading..." icon or status bar to indicate ongoing network activities.
+Remove all network calls on main thread. Learn about Thread creation in python before this.
+Internationalize strings.
+Read for the FIXMEs in the code.
+
+Patches are welcome, if you are okay with giving your changes under LGPL, just as the rest of the sources. :-)
