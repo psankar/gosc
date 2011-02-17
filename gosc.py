@@ -68,7 +68,7 @@ class gosc:
 		repos_scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 		repos_scroll.add(repos_treeview)
 
-		dialog = gtk.Dialog("Choose an architecture")
+		dialog = gtk.Dialog("Choose a Repository")
 		dialog.vbox.add(repos_scroll)
 		dialog.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
 		dialog.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
