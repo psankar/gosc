@@ -11,7 +11,7 @@ class oscwrapper:
 	#FIXME: As of now, I am using osc directly. Ideally, we should have a library.
 
 	#FIXME: Get the API url from the command line or a config file
-	command = "osc -A http://api.opensuse.org"
+	command = "osc -A https://api.opensuse.org"
 
 	def getProjects(self):
 		p = subprocess.Popen([oscwrapper.command + " my prj -m"], shell=True, stdout=subprocess.PIPE)
